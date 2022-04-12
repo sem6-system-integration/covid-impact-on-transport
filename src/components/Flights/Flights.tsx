@@ -5,6 +5,7 @@ import CovidDataGraph from "../CovidDataGraph/CovidDataGraph";
 import {Country} from "../../models/Country";
 import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
+import axios from "../../api/axios";
 
 
 interface FlightsProps {
@@ -12,27 +13,29 @@ interface FlightsProps {
 
 const Flights: FC<FlightsProps> = () => {
     const fetchFlightsCount = async () => {
-        const url = `http://localhost:8080/api/flights/airport/${airport}/year/${year}/month/${monthNumber}`;
-        const response = await fetch(url);
-        const json = await response.json();
-        setFlightData(json);
+        const url = `flights/airport/${airport}/year/${year}/month/${monthNumber}`;
+        const response = await axios.get(url);
+        const data = response.data;
+        setFlightData(data);
     }
 
     const fetchAirports = async (countryCode: string) => {
-        const url = `http://localhost:8080/api/airports/country/${countryCode}`;
-        const response = await fetch(url);
-        const json = await response.json();
-        setAirports(json['icao']);
+        const url = `airports/country/${countryCode}`;
+        const response = await axios.get(url);
+        const data = response.data;
+        setAirports(data['icao']);
+        setAirport(data['icao'][0]);
     }
 
     const fetchCovidData = async () => {
-        const url = `http://localhost:8080/api/covid/country/${countryCode}/year/${year}/month/${monthNumber}`;
-        const response = await fetch(url)
-        const json = await response.json()
-        setCovidData(json)
+        const url = `covid/country/${countryCode}/year/${year}/month/${monthNumber}`;
+        const response = await axios.get(url)
+        const data = response.data;
+        setCovidData(data);
     }
 
     const fetchData = async () => {
+        setSelectedMonth(months[monthNumber - 1]);
         await fetchCovidData();
         await fetchFlightsCount();
     }
@@ -44,6 +47,9 @@ const Flights: FC<FlightsProps> = () => {
         new Country('Italy', 'IT'),
         new Country('Ukraine', 'UA'),
     ];
+
+    // sort countries by name
+    countries.sort((c1, c2) => c1.name.localeCompare(c2.name));
 
     const years = [2019, 2020, 2021, 2022];
     const months = [
@@ -67,16 +73,17 @@ const Flights: FC<FlightsProps> = () => {
     const [countryCode, setCountryCode] = useState(countries[0].code);
     const [flightData, setFlightData] = useState<FlightData>({airportCode: "", flightsCount: 0, month: 0, year: 0});
     const [airports, setAirports] = useState<Array<string>>([]);
-    const [airport, setAirport] = useState('');
-    const selectedMonth = months[monthNumber - 1];
+    const [airport, setAirport] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState(months[0]);
 
     useEffect(() => {
         fetchAirports(countryCode);
-    }, [countryCode]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
-            <div className='col-6 d-flex mt-5'>
+            <div className='col-6 d-flex mt-5 px-4'>
                 <CovidDataGraph selectedMonth={selectedMonth} covidCases={covidData.confirmed}/>
                 <FlightsDataGraph selectedMonth={selectedMonth} flightCount={flightData.flightsCount}/>
             </div>

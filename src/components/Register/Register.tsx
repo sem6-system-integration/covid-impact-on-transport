@@ -8,7 +8,7 @@ interface RegisterProps {
 
 const Register: FC<RegisterProps> = () => {
     const [data, setData] = useState({
-        login: "",
+        username: "",
         password: "",
     })
     const [error, setError] = useState("")
@@ -22,8 +22,8 @@ const Register: FC<RegisterProps> = () => {
         e.preventDefault()
         try {
             const {data: res} = await axios.post("users", data)
+            console.log(res)
             navigate("/login")
-            console.log(res.message)
         } catch (error: any) {
             if (error.response && error.response.status >= 400 && error.response.status <= 500) {
                 setError(error.response.data.message)
@@ -37,9 +37,9 @@ const Register: FC<RegisterProps> = () => {
             {error && <div className="alert alert-danger text-center">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="form-label">Login</label>
-                    <input type="text" name="login" className="form-control" required
-                           onChange={handleChange} value={data.login}/>
+                    <label className="form-label">Username</label>
+                    <input type="text" name="username" className="form-control" required
+                           onChange={handleChange} value={data.username}/>
                     <div className="form-text">We'll never share your login details with anyone else.</div>
                 </div>
                 <div className="mb-3">

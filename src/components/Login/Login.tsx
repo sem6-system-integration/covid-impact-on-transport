@@ -6,7 +6,10 @@ interface LoginProps {
 }
 
 const Login: FC<LoginProps> = () => {
-    const [data, setData] = useState({login: "", password: ""})
+    const [data, setData] = useState({
+        username: "",
+        password: ""
+    })
     const [error, setError] = useState("")
 
     const handleChange = ({currentTarget: input}: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,12 +19,14 @@ const Login: FC<LoginProps> = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const {data: res} = await axios.post("auth", data)
-            localStorage.setItem("token", res.data)
+            const {data: res} = await axios.post("auth/login", data)
+            const token = res.split(" ")[1]
+            localStorage.setItem("token", token)
+            console.log(token)
             window.location.href = "/"
         } catch (error: any) {
             if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-                setError(error.response.data.message)
+                setError("Wrong username or password")
             }
         }
     }
@@ -32,9 +37,9 @@ const Login: FC<LoginProps> = () => {
             {error && <div className="alert alert-danger text-center">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="form-label">Login</label>
-                    <input type="email" name="email" className="form-control" required
-                           onChange={handleChange} value={data.login}/>
+                    <label className="form-label">Username</label>
+                    <input type="text" name="username" className="form-control" required
+                           onChange={handleChange} value={data.username}/>
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Password</label>

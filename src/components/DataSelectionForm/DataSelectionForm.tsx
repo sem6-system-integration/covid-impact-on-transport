@@ -28,11 +28,12 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                     <td>
                         <select className='form-select' onChange={(e) => {
                             setCountry(e.target.value);
-                            console.log(e.target.value);
                             fetchAirports(e.target.value)
                         }}>
-                            {countries.sort((c1, c2) => c1.name.localeCompare(c2.name)).map((country) =>
-                                <option key={country.code} value={country.code}>{country.name}</option>)}
+                            {
+                                countries.map((country) =>
+                                    <option key={country.code} value={country.code}>{country.name}</option>)
+                            }
                         </select>
                     </td>
                 </tr>

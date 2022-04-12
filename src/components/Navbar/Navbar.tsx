@@ -8,7 +8,7 @@ interface NavbarProps {
 
 const Navbar: FC<NavbarProps> = () => {
     const token = localStorage.getItem("token");
-    const login = token ? JSON.parse(atob(token.split('.')[1])).login : null;
+    const username = token ? JSON.parse(atob(token.split('.')[1])).username : null;
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-light">
@@ -32,7 +32,7 @@ const Navbar: FC<NavbarProps> = () => {
                                     <NavbarLink to="/register" text="Register"/>
                                 </>
                             }
-                            {token && <NavbarUserDropdown login={login}/>}
+                            {token && <NavbarUserDropdown username={username}/>}
                         </ul>
                     </div>
                 </div>

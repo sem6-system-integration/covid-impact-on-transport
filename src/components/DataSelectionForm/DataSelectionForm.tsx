@@ -1,17 +1,17 @@
 import React, {FC} from 'react';
-import {Country} from "../../models/Country";
+import {Country} from "../../types/Country";
 
 
 interface DataSelectionFormProps {
     setCountry: React.Dispatch<React.SetStateAction<string>>;
-    countries: Array<Country>;
-    fetchAirports: (countryCode: string) => void;
+    countries: Country[];
+    fetchAirports: (code: string) => void;
     setAirport: React.Dispatch<React.SetStateAction<string>>;
-    airports: Array<string>;
+    airports: string[];
     setYear: React.Dispatch<React.SetStateAction<number>>;
-    years: Array<number>;
+    years: number[];
     setMonthNumber: React.Dispatch<React.SetStateAction<number>>;
-    months: Array<string>;
+    months: string[];
     fetchData: () => void;
 }
 
@@ -21,8 +21,9 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                                                            months, fetchData
                                                        }) => {
     return (
-        <div className='row col-11 col-sm-8 col-md-6 col-lg-4 col-xl-3 mx-auto mt-3'>
+        <div className='row col-11 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto mt-3'>
             <table>
+                <tbody>
                 <tr>
                     <td>Country:</td>
                     <td>
@@ -61,6 +62,7 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                         </select>
                     </td>
                 </tr>
+                </tbody>
             </table>
             <button className='btn btn-primary mt-2' onClick={fetchData}>Fetch Data</button>
         </div>

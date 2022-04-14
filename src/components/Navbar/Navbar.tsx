@@ -13,7 +13,7 @@ const Navbar: FC<NavbarProps> = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-light">
             <div className="container-fluid">
-                <span className="navbar-brand">Covid impact on transport</span>
+                <span className="navbar-brand">Covid Impact on Transport</span>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" aria-expanded="false"
                         data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
                         aria-label="Toggle navigation">

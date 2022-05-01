@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from 'react';
-import DataSelectionForm from "../DataSelectionForm/DataSelectionForm";
-import FlightsDataGraph from "../FlightsDataGraph/FlightsDataGraph";
-import CovidDataGraph from "../CovidDataGraph/CovidDataGraph";
+import DataSelectionForm from "./DataSelectionForm";
+import FlightsDataGraph from "./FlightsDataGraph";
+import CovidDataGraph from "./CovidDataGraph";
 import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
 import axios from "../../api/axios";

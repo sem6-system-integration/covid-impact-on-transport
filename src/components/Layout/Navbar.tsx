@@ -1,6 +1,6 @@
 import React, {FC} from 'react';
-import NavbarLink from "../NavbarLink/NavbarLink";
-import NavbarUserDropdown from "../NavbarUserDropdown/NavbarUserDropdown";
+import NavbarLink from "./NavbarLink";
+import NavbarUserDropdown from "./NavbarUserDropdown";
 
 
 interface NavbarProps {

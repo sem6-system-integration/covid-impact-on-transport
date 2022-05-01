@@ -21,7 +21,7 @@ function App() {
     const [token, setToken] = useState<string>(localStorage.getItem('jwtToken') ?? '');
 
     useEffect(() => {
-        document.title = "Bank App"
+        document.title = "Covid impact on transport"
     }, []);
 
     return (

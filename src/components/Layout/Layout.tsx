@@ -1,5 +1,5 @@
 import React, {FC, ReactNode} from 'react';
-import Navbar from "./Navbar";
+import MyNavbar from "./MyNavbar";
 
 
 interface LayoutProps {
@@ -8,7 +8,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({children}) => (
     <div className="d-flex flex-column min-vh-100">
-        <Navbar/>
+        <MyNavbar/>
         <>{children}</>
     </div>
 );

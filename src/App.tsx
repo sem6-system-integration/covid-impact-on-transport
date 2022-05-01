@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
@@ -9,29 +9,35 @@ import {Navigate, Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Flights from "./components/Flights/Flights";
 
-function App() {
-    let token = localStorage.getItem("token")
-    // check if token is expired
-    if (token) {
-        let payload = JSON.parse(atob(token.split('.')[1]))
-        if (payload.exp < Date.now() / 1000) {
-            localStorage.removeItem("token")
-            token = null
+export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
+    {
+        token: '',
+        setToken: () => {
         }
     }
+);
+
+function App() {
+    const [token, setToken] = useState<string>(localStorage.getItem('jwtToken') ?? '');
+
+    useEffect(() => {
+        document.title = "Bank App"
+    }, []);
 
     return (
-        <Layout>
-            <Routes>
-                <Route path="/" element={<Home/>}/>
+        <TokenContext.Provider value={{token, setToken}}>
+            <Layout>
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
 
-                <Route path="/register" element={<Register/>}/>
-                <Route path="/login" element={<Login/>}/>
+                    <Route path="/register" element={<Register/>}/>
+                    <Route path="/login" element={<Login redirectTo="/"/>}/>
 
-                {token && <Route path="/flights" element={<Flights/>}/>}
-                <Route path="/flights" element={<Navigate replace to="/login"/>}/>
-            </Routes>
-        </Layout>
+                    {token && <Route path="/flights" element={<Flights/>}/>}
+                    <Route path="/flights" element={<Navigate replace to="/login"/>}/>
+                </Routes>
+            </Layout>
+        </TokenContext.Provider>
     );
 }
 

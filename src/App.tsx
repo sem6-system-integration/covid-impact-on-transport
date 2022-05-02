@@ -9,7 +9,6 @@ import {Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Flights from "./components/Flights/Flights";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
-import Error404NotFound from "./components/Errors/Error404NotFound";
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
     {
@@ -23,7 +22,7 @@ function App() {
     const [token, setToken] = useState<string>(localStorage.getItem('jwtToken') ?? '');
 
     useEffect(() => {
-        document.title = "Covid impact on transport"
+        document.title = "Covid Impact on Transport"
     }, []);
 
     return (
@@ -37,8 +36,8 @@ function App() {
                     <Route element={<ProtectedRoute/>}>
                         <Route path="/flights" element={<Flights/>}/>
                     </Route>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="*" element={<Error404NotFound/>}/>
+
+                    <Route path="*" element={<Home/>}/>
                 </Routes>
             </Layout>
         </TokenContext.Provider>

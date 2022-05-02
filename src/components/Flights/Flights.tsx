@@ -1,14 +1,38 @@
 import React, {FC, useEffect, useState} from 'react';
 import DataSelectionForm from "./DataSelectionForm";
-import FlightsDataGraph from "./FlightsDataGraph";
-import CovidDataGraph from "./CovidDataGraph";
+import FlightChart from "./FlightChart";
+import CovidChart from "./CovidChart";
 import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
 import {Country} from "../../types/Country";
 import useAxios from "../../hooks/useAxios";
 import {useFormik} from "formik";
-import {Col} from "react-bootstrap";
+import {Row} from "react-bootstrap";
+import * as yup from "yup";
 
+const currentYear = new Date().getFullYear();
+
+const validationSchema = yup.object().shape({
+    year1: yup.number()
+        .required()
+        .notOneOf([yup.ref('year2')], 'Year 1 cannot be the same as year 2')
+        .label('Year 1'),
+    year2: yup.number()
+        .required()
+        .notOneOf([yup.ref('year1')], 'Year 2 cannot be the same as year 1')
+        .label('Year 1'),
+    month: yup.number()
+        .required()
+        .when('year1', {
+            is: (year1: number) => year1 === currentYear,
+            then: yup.number().max(new Date().getMonth() - 1, 'Only previous months are available for the current year')
+        })
+        .when('year2', {
+            is: (year2: number) => year2 === currentYear,
+            then: yup.number().max(new Date().getMonth() - 1, 'Only previous months are available for the current year')
+        })
+        .label('Month'),
+});
 
 interface FlightsProps {
 }
@@ -18,10 +42,18 @@ const Flights: FC<FlightsProps> = () => {
     const years = [2019, 2020, 2021, 2022];
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const [displayedMonthName, setDisplayedMonthName] = useState(months[0]);
+    const [displayedYear1, setDisplayedYear1] = useState(years[1]);
+    const [displayedYear2, setDisplayedYear2] = useState(years[2]);
     const [countries, setCountries] = useState<Country[]>([]);
     const [airports, setAirports] = useState<string[]>([]);
-    const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
-    const [flightData, setFlightData] = useState<FlightData>({airportCode: '', flightsCount: 0, month: 0, year: 0});
+    const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [firstFlightData, setFirstFlightData] = useState<FlightData>({
+        airportCode: '', flightCount: 0, month: 0, year: 0
+    });
+    const [secondFlightData, setSecondFlightData] = useState<FlightData>({
+        airportCode: '', flightCount: 0, month: 0, year: 0
+    });
     const [flightsFetching, setFlightsFetching] = useState(false);
     const [covidFetching, setCovidFetching] = useState(false);
 
@@ -29,15 +61,31 @@ const Flights: FC<FlightsProps> = () => {
         initialValues: {
             countryCode: 'AF',
             airportCode: '',
-            year: 2020,
+            year1: 2020,
+            year2: 2021,
             month: 0,
         },
-        onSubmit: values => {
+        validationSchema: validationSchema,
+        onSubmit: async values => {
             setCovidFetching(true);
             setFlightsFetching(true);
-            fetchCovidData(values.countryCode, values.year, values.month + 1);
-            fetchFlightsCount(values.airportCode, values.year, values.month + 1);
+
+            const covidData1 = await fetchCovidData(values.countryCode, values.year1, parseInt(String(values.month)) + 1);
+            const covidData2 = await fetchCovidData(values.countryCode, values.year2, parseInt(String(values.month)) + 1);
+            const flightData1 = await fetchFlightData(values.airportCode, values.year1, parseInt(String(values.month)) + 1);
+            const flightData2 = await fetchFlightData(values.airportCode, values.year2, parseInt(String(values.month)) + 1);
+            setCovidFetching(false);
+            setFlightsFetching(false);
+            if (!covidData1 || !covidData2 || !flightData1 || !flightData2) return
+
+            setFirstCovidData(covidData1);
+            setSecondCovidData(covidData2);
+            setFirstFlightData(flightData1);
+            setSecondFlightData(flightData2);
+
             setDisplayedMonthName(months[formik.values.month]);
+            setDisplayedYear1(formik.values.year1);
+            setDisplayedYear2(formik.values.year2);
         }
     });
 
@@ -53,28 +101,22 @@ const Flights: FC<FlightsProps> = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [axios, formik.values.countryCode]);
 
-    const fetchCovidData = (countryCode: string, year: number, month: number) => {
-        axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
-            .then(response => {
-                setCovidData(response.data);
-                setCovidFetching(false);
-            })
-            .catch(error => {
-                console.log(error);
-                setCovidFetching(false);
-            });
+    const fetchCovidData = async (countryCode: string, year: number, month: number) => {
+        try {
+            const response = await axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
+            return response.data
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-    const fetchFlightsCount = (airportCode: string, year: number, month: number) => {
-        axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
-            .then(response => {
-                setFlightData(response.data);
-                setFlightsFetching(false);
-            })
-            .catch(error => {
-                console.log(error);
-                setFlightsFetching(false);
-            });
+    const fetchFlightData = async (airportCode: string, year: number, month: number) => {
+        try {
+            const response = await axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
+            return response.data
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     useEffect(() => {
@@ -82,7 +124,7 @@ const Flights: FC<FlightsProps> = () => {
             .then(response => {
                 const lowercaseCountries = response.data.map((country: Country) => {
                     return {
-                        name: country.name.charAt(0).toUpperCase() + country.name.toLowerCase().slice(1),
+                        name: country.name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
                         code: country.code
                     }
                 });
@@ -97,10 +139,26 @@ const Flights: FC<FlightsProps> = () => {
 
     return (
         <>
-            <Col xs={6} className='d-flex mt-5 px-4'>
-                <CovidDataGraph selectedMonth={displayedMonthName} covidCases={covidData.confirmed}/>
-                <FlightsDataGraph selectedMonth={displayedMonthName} flightCount={flightData.flightsCount}/>
-            </Col>
+            <Row className='mx-auto mt-5 mb-3 justify-content-around col-11'>
+                <div className="col-5">
+                    <CovidChart
+                        year1={displayedYear1}
+                        year2={displayedYear2}
+                        month={displayedMonthName}
+                        covidCases1={firstCovidData.confirmed}
+                        covidCases2={secondCovidData.confirmed}
+                    />
+                </div>
+                <div className="col-5">
+                    <FlightChart
+                        year1={displayedYear1}
+                        year2={displayedYear2}
+                        month={displayedMonthName}
+                        flightCount1={firstFlightData.flightCount}
+                        flightCount2={secondFlightData.flightCount}
+                    />
+                </div>
+            </Row>
             <DataSelectionForm
                 countries={countries}
                 airports={airports}

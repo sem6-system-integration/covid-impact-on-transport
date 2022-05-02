@@ -47,27 +47,43 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">{formik.errors.airport}</Form.Control.Feedback>
                 </FloatingLabel>
-                <FloatingLabel controlId="inputYear" label="Year" className="mb-2">
-                    <Form.Select
-                        name="year"
-                        onChange={formik.handleChange}
-                        value={formik.values.year}>
-                        {years.map((year) =>
-                            <option key={year} value={year}>{year}</option>
-                        )}
-                    </Form.Select>
-                    <Form.Control.Feedback type="invalid">{formik.errors.year}</Form.Control.Feedback>
-                </FloatingLabel>
+                <div className="d-flex">
+                    <FloatingLabel controlId="inputYear1" label="Year 1" className="mb-2 pe-1 col-6">
+                        <Form.Select
+                            name="year1"
+                            onChange={formik.handleChange}
+                            value={formik.values.year1}
+                            isInvalid={formik.touched.year1 && !!formik.errors.year1}>
+                            {years.map((year) =>
+                                <option key={year} value={year}>{year}</option>
+                            )}
+                        </Form.Select>
+                        <Form.Control.Feedback type="invalid">{formik.errors.year1}</Form.Control.Feedback>
+                    </FloatingLabel>
+                    <FloatingLabel controlId="inputYear2" label="Year 2" className="mb-2 ps-1 col-6">
+                        <Form.Select
+                            name="year2"
+                            onChange={formik.handleChange}
+                            value={formik.values.year2}
+                            isInvalid={formik.touched.year2 && !!formik.errors.year2}>
+                            {years.map((year) =>
+                                <option key={year} value={year}>{year}</option>
+                            )}
+                        </Form.Select>
+                        <Form.Control.Feedback type="invalid">{formik.errors.year2}</Form.Control.Feedback>
+                    </FloatingLabel>
+                </div>
                 <FloatingLabel controlId="inputMonth" label="Month" className="mb-2">
                     <Form.Select
                         name="month"
                         onChange={formik.handleChange}
-                        value={formik.values.month}>
+                        value={formik.values.month}
+                        isInvalid={formik.touched.month && !!formik.errors.month}>
                         {months.map((month, index) =>
                             <option key={month} value={index}>{month}</option>
                         )}
                     </Form.Select>
-                    <Form.Control.Feedback type="invalid">{formik.errors.year}</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{formik.errors.month}</Form.Control.Feedback>
                 </FloatingLabel>
                 <Col className="d-flex justify-content-center">
                     <Button variant="primary" type="submit" className='mt-2 col-12 col-lg-3'>

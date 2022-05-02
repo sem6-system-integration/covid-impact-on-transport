@@ -5,9 +5,11 @@ import 'bootstrap/dist/js/bootstrap.js';
 import Register from "./components/Auth/Register";
 import Login from "./components/Auth/Login";
 import Home from "./components/Home";
-import {Navigate, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Layout from "./components/Layout/Layout";
 import Flights from "./components/Flights/Flights";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import Error404NotFound from "./components/Errors/Error404NotFound";
 
 export const TokenContext = React.createContext<{ token: string; setToken: Dispatch<SetStateAction<string>>; }>(
     {
@@ -28,13 +30,15 @@ function App() {
         <TokenContext.Provider value={{token, setToken}}>
             <Layout>
                 <Routes>
+                    {!token && <>
+                        <Route path="/register" element={<Register/>}/>
+                        <Route path="/login" element={<Login redirectTo="/"/>}/>
+                    </>}
+                    <Route element={<ProtectedRoute/>}>
+                        <Route path="/flights" element={<Flights/>}/>
+                    </Route>
                     <Route path="/" element={<Home/>}/>
-
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/login" element={<Login redirectTo="/"/>}/>
-
-                    {token && <Route path="/flights" element={<Flights/>}/>}
-                    <Route path="/flights" element={<Navigate replace to="/login"/>}/>
+                    <Route path="*" element={<Error404NotFound/>}/>
                 </Routes>
             </Layout>
         </TokenContext.Provider>

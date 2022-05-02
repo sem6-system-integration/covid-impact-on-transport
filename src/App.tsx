@@ -22,7 +22,7 @@ function App() {
     const [token, setToken] = useState<string>(localStorage.getItem('jwtToken') ?? '');
 
     useEffect(() => {
-        document.title = "Covid impact on transport"
+        document.title = "Covid Impact on Transport"
     }, []);
 
     return (

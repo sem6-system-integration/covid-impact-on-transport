@@ -7,7 +7,7 @@ interface HomeProps {
 
 const Home: FC<HomeProps> = () => (
     <Col className="mx-auto mt-5 text-center px-4 px-lg-5">
-        <h1 className="mb-4">Covid impact on transport</h1>
+        <h1 className="mb-4">Covid Impact on Transport</h1>
         <p>Welcome to the Covid impact on transport app!</p>
         <p>
             This app shows the impact of Covid on the transport in the world.

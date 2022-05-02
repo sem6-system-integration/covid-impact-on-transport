@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from "chart.js";
+import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip,} from 'chart.js';
 import {Bar} from 'react-chartjs-2';
 
 ChartJS.register(
@@ -19,34 +19,32 @@ export const chartOptions = {
         },
         title: {
             display: true,
-            text: 'Covid cases',
+            text: `Flights`,
         },
     },
 };
 
-
-interface CovidDataGraphProps {
-    selectedMonth: string;
-    covidCases: number;
+interface SecondChartProps {
+    month: string;
+    flightCount: number;
 }
 
-const CovidDataGraph: FC<CovidDataGraphProps> = ({selectedMonth, covidCases}) => {
+const SecondChart: FC<SecondChartProps> = ({month, flightCount}) => {
     let chartData = {
-        labels: [selectedMonth],
+        labels: [month],
         datasets: [
             {
-                label: 'Number of COVID-19 cases',
-                data: [covidCases],
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                label: 'Number of flights',
+                data: [flightCount],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
             }
         ],
     };
 
-
     return (
         // @ts-ignore
         <Bar options={chartOptions} data={chartData} type={"bar"}/>
-    );
+    )
 }
 
-export default CovidDataGraph;
+export default SecondChart;

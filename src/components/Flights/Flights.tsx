@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from 'react';
 import DataSelectionForm from "./DataSelectionForm";
-import FlightsDataGraph from "./FlightsDataGraph";
-import CovidDataGraph from "./CovidDataGraph";
+import SecondChart from "./SecondChart";
+import FirstChart from "./FirstChart";
 import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
 import {Country} from "../../types/Country";
@@ -20,8 +20,20 @@ const Flights: FC<FlightsProps> = () => {
     const [displayedMonthName, setDisplayedMonthName] = useState(months[0]);
     const [countries, setCountries] = useState<Country[]>([]);
     const [airports, setAirports] = useState<string[]>([]);
-    const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
-    const [flightData, setFlightData] = useState<FlightData>({airportCode: '', flightsCount: 0, month: 0, year: 0});
+    const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [firstFlightData, setFirstFlightData] = useState<FlightData>({
+        airportCode: '',
+        flightsCount: 0,
+        month: 0,
+        year: 0
+    });
+    const [secondFlightData, setSecondFlightData] = useState<FlightData>({
+        airportCode: '',
+        flightsCount: 0,
+        month: 0,
+        year: 0
+    });
     const [flightsFetching, setFlightsFetching] = useState(false);
     const [covidFetching, setCovidFetching] = useState(false);
 
@@ -29,15 +41,31 @@ const Flights: FC<FlightsProps> = () => {
         initialValues: {
             countryCode: 'AF',
             airportCode: '',
-            year: 2020,
+            year1: 2020,
+            year2: 2021,
             month: 0,
         },
-        onSubmit: values => {
+        onSubmit: async values => {
             setCovidFetching(true);
             setFlightsFetching(true);
-            fetchCovidData(values.countryCode, values.year, values.month + 1);
-            fetchFlightsCount(values.airportCode, values.year, values.month + 1);
+
+            const covidData1 = await fetchCovidData(values.countryCode, values.year1, values.month + 1);
+            const covidData2 = await fetchCovidData(values.countryCode, values.year2, values.month + 1);
+            const FlightData1 = await fetchFlightData(values.airportCode, values.year1, values.month + 1);
+            const FlightData2 = await fetchFlightData(values.airportCode, values.year2, values.month + 1);
+            console.log(covidData1);
+            console.log(covidData2);
+            console.log(FlightData1);
+            console.log(FlightData2);
+
+            setFirstCovidData(covidData1);
+            setSecondCovidData(covidData2);
+            setFirstFlightData(FlightData1);
+            setSecondFlightData(FlightData2);
             setDisplayedMonthName(months[formik.values.month]);
+
+            setCovidFetching(false);
+            setFlightsFetching(false);
         }
     });
 
@@ -53,28 +81,14 @@ const Flights: FC<FlightsProps> = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [axios, formik.values.countryCode]);
 
-    const fetchCovidData = (countryCode: string, year: number, month: number) => {
-        axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
-            .then(response => {
-                setCovidData(response.data);
-                setCovidFetching(false);
-            })
-            .catch(error => {
-                console.log(error);
-                setCovidFetching(false);
-            });
+    const fetchCovidData = async (countryCode: string, year: number, month: number) => {
+        const response = await axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
+        return response.data
     }
 
-    const fetchFlightsCount = (airportCode: string, year: number, month: number) => {
-        axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
-            .then(response => {
-                setFlightData(response.data);
-                setFlightsFetching(false);
-            })
-            .catch(error => {
-                console.log(error);
-                setFlightsFetching(false);
-            });
+    const fetchFlightData = async (airportCode: string, year: number, month: number) => {
+        const response = await axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
+        return response.data
     }
 
     useEffect(() => {
@@ -98,8 +112,8 @@ const Flights: FC<FlightsProps> = () => {
     return (
         <>
             <Col xs={6} className='d-flex mt-5 px-4'>
-                <CovidDataGraph selectedMonth={displayedMonthName} covidCases={covidData.confirmed}/>
-                <FlightsDataGraph selectedMonth={displayedMonthName} flightCount={flightData.flightsCount}/>
+                <FirstChart month={displayedMonthName} covidCases={firstCovidData.confirmed}/>
+                <SecondChart month={displayedMonthName} flightCount={firstFlightData.flightsCount}/>
             </Col>
             <DataSelectionForm
                 countries={countries}

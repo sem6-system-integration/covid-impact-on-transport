@@ -4,44 +4,17 @@ import FlightsDataGraph from "./FlightsDataGraph";
 import CovidDataGraph from "./CovidDataGraph";
 import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
-import axios from "../../api/axios";
 import {Country} from "../../types/Country";
+import useAxios from "../../hooks/useAxios";
 
 
 interface FlightsProps {
 }
 
 const Flights: FC<FlightsProps> = () => {
-    const fetchFlightsCount = async () => {
-        const url = `flights/airport/${airport}/year/${year}/month/${monthNumber}`;
-        const response = await axios.get(url);
-        const data = response.data;
-        setFlightData(data);
-    }
-
-    const fetchAirports = async (code: string) => {
-        const url = `airports/country/${code}`;
-        const response = await axios.get(url);
-        const data = response.data;
-        setAirports(data['icao']);
-    }
-
-    const fetchCovidData = async () => {
-        const url = `covid/country/${countryCode}/year/${year}/month/${monthNumber}`;
-        const response = await axios.get(url)
-        const data = response.data;
-        setCovidData(data);
-    }
-
-    const fetchData = async () => {
-        setSelectedMonth(months[monthNumber - 1]);
-        await fetchCovidData();
-        await fetchFlightsCount();
-    }
-
+    const axios = useAxios()
     const years = [2019, 2020, 2021, 2022];
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
     const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
     const [year, setYear] = useState(years[0]);
     const [monthNumber, setMonthNumber] = useState(1);
@@ -52,25 +25,59 @@ const Flights: FC<FlightsProps> = () => {
     const [airports, setAirports] = useState<string[]>([]);
     const [airport, setAirport] = useState("");
 
-    useEffect(() => {
-        const fetchCountries = async () => {
-            const response = await axios.get("country");
-            const data = response.data;
-            // lowercase all country names but keep the first letter capitalized
-            const lowercaseCountries = data.map((country: Country) => {
-                return {
-                    name: country.name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
-                    code: country.code
-                }
-            });
-            setCountries(lowercaseCountries);
-        };
-
-        fetchCountries().then(() => {
-            fetchAirports(countryCode).then(() => {
-                setAirport(airports[0]);
+    const fetchFlightsCount = () => {
+        axios.get(`flights/airport/${airport}/year/${year}/month/${monthNumber}`)
+            .then(response => {
+                setFlightData(response.data);
             })
-        });
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const fetchAirports = async (code: string) => {
+        axios.get(`airports/country/${code}`)
+            .then(response => {
+                setAirports(response.data['icao']);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const fetchCovidData = () => {
+        axios.get(`covid/country/${countryCode}/year/${year}/month/${monthNumber}`)
+            .then(response => {
+                setCovidData(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    const fetchData = () => {
+        setSelectedMonth(months[monthNumber - 1]);
+        fetchCovidData();
+        fetchFlightsCount();
+    }
+
+    useEffect(() => {
+        axios.get("country")
+            .then(response => {
+                const lowercaseCountries = response.data.map((country: Country) => {
+                    return {
+                        name: country.name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
+                        code: country.code
+                    }
+                });
+                setCountries(lowercaseCountries);
+                fetchAirports(countryCode).then(() => {
+                    setAirport(airports[0]);
+                });
+            })
+            .catch(error => {
+                console.log(error);
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

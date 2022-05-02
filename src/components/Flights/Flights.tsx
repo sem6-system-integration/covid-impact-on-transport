@@ -6,6 +6,8 @@ import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
 import {Country} from "../../types/Country";
 import useAxios from "../../hooks/useAxios";
+import {useFormik} from "formik";
+import {Col} from "react-bootstrap";
 
 
 interface FlightsProps {
@@ -15,38 +17,40 @@ const Flights: FC<FlightsProps> = () => {
     const axios = useAxios()
     const years = [2019, 2020, 2021, 2022];
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
-    const [year, setYear] = useState(years[0]);
-    const [monthNumber, setMonthNumber] = useState(1);
-    const [selectedMonth, setSelectedMonth] = useState(months[0]);
+    const [displayedMonthName, setDisplayedMonthName] = useState(months[0]);
     const [countries, setCountries] = useState<Country[]>([]);
-    const [countryCode, setCountryCode] = useState<string>('AF');
-    const [flightData, setFlightData] = useState<FlightData>({airportCode: "", flightsCount: 0, month: 0, year: 0});
     const [airports, setAirports] = useState<string[]>([]);
-    const [airport, setAirport] = useState("");
+    const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [flightData, setFlightData] = useState<FlightData>({airportCode: "", flightsCount: 0, month: 0, year: 0});
 
-    const fetchFlightsCount = () => {
-        axios.get(`flights/airport/${airport}/year/${year}/month/${monthNumber}`)
+    const formik = useFormik({
+        initialValues: {
+            countryCode: 'AF',
+            airportCode: '',
+            year: 2020,
+            month: 1,
+        },
+        onSubmit: values => {
+            fetchCovidData(values.countryCode, values.year, values.month);
+            fetchFlightsCount(values.airportCode, values.year, values.month);
+            setDisplayedMonthName(months[formik.values.month]);
+        }
+    });
+
+    useEffect(() => {
+        axios.get(`airports/country/${formik.values.countryCode}`)
             .then(response => {
-                setFlightData(response.data);
+                setAirports(response.data['airportCodes']);
+                formik.setFieldValue('airportCode', response.data['airportCodes'][0]);
             })
             .catch(error => {
                 console.log(error);
             });
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [axios, formik.values.countryCode]);
 
-    const fetchAirports = async (code: string) => {
-        axios.get(`airports/country/${code}`)
-            .then(response => {
-                setAirports(response.data['icao']);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    const fetchCovidData = () => {
-        axios.get(`covid/country/${countryCode}/year/${year}/month/${monthNumber}`)
+    const fetchCovidData = (countryCode: string, year: number, month: number) => {
+        axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
             .then(response => {
                 setCovidData(response.data);
             })
@@ -55,25 +59,27 @@ const Flights: FC<FlightsProps> = () => {
             });
     }
 
-    const fetchData = () => {
-        setSelectedMonth(months[monthNumber - 1]);
-        fetchCovidData();
-        fetchFlightsCount();
+    const fetchFlightsCount = (airportCode: string, year: number, month: number) => {
+        axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
+            .then(response => {
+                setFlightData(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     useEffect(() => {
-        axios.get("country")
+        axios.get("countries")
             .then(response => {
                 const lowercaseCountries = response.data.map((country: Country) => {
                     return {
-                        name: country.name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
+                        name: country.name.charAt(0).toUpperCase() + country.name.toLowerCase().slice(1),
                         code: country.code
                     }
                 });
+                formik.setFieldValue('countryCode', lowercaseCountries[0].code);
                 setCountries(lowercaseCountries);
-                fetchAirports(countryCode).then(() => {
-                    setAirport(airports[0]);
-                });
             })
             .catch(error => {
                 console.log(error);
@@ -83,14 +89,17 @@ const Flights: FC<FlightsProps> = () => {
 
     return (
         <>
-            <div className='col-6 d-flex mt-5 px-4'>
-                <CovidDataGraph selectedMonth={selectedMonth} covidCases={covidData.confirmed}/>
-                <FlightsDataGraph selectedMonth={selectedMonth} flightCount={flightData.flightsCount}/>
-            </div>
-            <DataSelectionForm setCountry={setCountryCode} countries={countries}
-                               fetchAirports={fetchAirports} setAirport={setAirport} airports={airports}
-                               setYear={setYear} years={years} setMonthNumber={setMonthNumber} months={months}
-                               fetchData={fetchData}/>
+            <Col xs={6} className='d-flex mt-5 px-4'>
+                <CovidDataGraph selectedMonth={displayedMonthName} covidCases={covidData.confirmed}/>
+                <FlightsDataGraph selectedMonth={displayedMonthName} flightCount={flightData.flightsCount}/>
+            </Col>
+            <DataSelectionForm
+                countries={countries}
+                airports={airports}
+                years={years}
+                months={months}
+                formik={formik}
+            />
         </>
     );
 }

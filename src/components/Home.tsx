@@ -5,7 +5,7 @@ interface HomeProps {
 }
 
 const Home: FC<HomeProps> = () => (
-    <div className="mx-auto mt-5 text-center">
+    <div className="mx-auto mt-5 text-center px-4 px-lg-5">
         <h1 className="mb-4">Covid impact on transport</h1>
         <p>Welcome to the Covid impact on transport app!</p>
         <p>

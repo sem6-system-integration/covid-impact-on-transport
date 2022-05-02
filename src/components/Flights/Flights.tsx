@@ -105,7 +105,7 @@ const Flights: FC<FlightsProps> = () => {
             .then(response => {
                 const lowercaseCountries = response.data.map((country: Country) => {
                     return {
-                        name: country.name.charAt(0).toUpperCase() + country.name.toLowerCase().slice(1),
+                        name: country.name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()),
                         code: country.code
                     }
                 });

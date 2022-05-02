@@ -8,7 +8,31 @@ import {Country} from "../../types/Country";
 import useAxios from "../../hooks/useAxios";
 import {useFormik} from "formik";
 import {Row} from "react-bootstrap";
+import * as yup from "yup";
 
+const currentYear = new Date().getFullYear();
+
+const validationSchema = yup.object().shape({
+    year1: yup.number()
+        .required()
+        .notOneOf([yup.ref('year2')], 'Year 1 cannot be the same as year 2')
+        .label('Year 1'),
+    year2: yup.number()
+        .required()
+        .notOneOf([yup.ref('year1')], 'Year 2 cannot be the same as year 1')
+        .label('Year 1'),
+    month: yup.number()
+        .required()
+        .when('year1', {
+            is: (year1: number) => year1 === currentYear,
+            then: yup.number().max(new Date().getMonth() - 1, 'Only previous months are available for the current year')
+        })
+        .when('year2', {
+            is: (year2: number) => year2 === currentYear,
+            then: yup.number().max(new Date().getMonth() - 1, 'Only previous months are available for the current year')
+        })
+        .label('Month'),
+});
 
 interface FlightsProps {
 }
@@ -25,16 +49,10 @@ const Flights: FC<FlightsProps> = () => {
     const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
     const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
     const [firstFlightData, setFirstFlightData] = useState<FlightData>({
-        airportCode: '',
-        flightCount: 0,
-        month: 0,
-        year: 0
+        airportCode: '', flightCount: 0, month: 0, year: 0
     });
     const [secondFlightData, setSecondFlightData] = useState<FlightData>({
-        airportCode: '',
-        flightCount: 0,
-        month: 0,
-        year: 0
+        airportCode: '', flightCount: 0, month: 0, year: 0
     });
     const [flightsFetching, setFlightsFetching] = useState(false);
     const [covidFetching, setCovidFetching] = useState(false);
@@ -47,6 +65,7 @@ const Flights: FC<FlightsProps> = () => {
             year2: 2021,
             month: 0,
         },
+        validationSchema: validationSchema,
         onSubmit: async values => {
             setCovidFetching(true);
             setFlightsFetching(true);

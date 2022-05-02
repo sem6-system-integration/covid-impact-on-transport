@@ -52,7 +52,8 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                         <Form.Select
                             name="year1"
                             onChange={formik.handleChange}
-                            value={formik.values.year1}>
+                            value={formik.values.year1}
+                            isInvalid={formik.touched.year1 && !!formik.errors.year1}>
                             {years.map((year) =>
                                 <option key={year} value={year}>{year}</option>
                             )}
@@ -63,7 +64,8 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                         <Form.Select
                             name="year2"
                             onChange={formik.handleChange}
-                            value={formik.values.year2}>
+                            value={formik.values.year2}
+                            isInvalid={formik.touched.year2 && !!formik.errors.year2}>
                             {years.map((year) =>
                                 <option key={year} value={year}>{year}</option>
                             )}
@@ -75,12 +77,13 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                     <Form.Select
                         name="month"
                         onChange={formik.handleChange}
-                        value={formik.values.month}>
+                        value={formik.values.month}
+                        isInvalid={formik.touched.month && !!formik.errors.month}>
                         {months.map((month, index) =>
                             <option key={month} value={index}>{month}</option>
                         )}
                     </Form.Select>
-                    <Form.Control.Feedback type="invalid">{formik.errors.year}</Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{formik.errors.month}</Form.Control.Feedback>
                 </FloatingLabel>
                 <Col className="d-flex justify-content-center">
                     <Button variant="primary" type="submit" className='mt-2 col-12 col-lg-3'>

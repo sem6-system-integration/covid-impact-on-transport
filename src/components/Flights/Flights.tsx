@@ -22,6 +22,8 @@ const Flights: FC<FlightsProps> = () => {
     const [airports, setAirports] = useState<string[]>([]);
     const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
     const [flightData, setFlightData] = useState<FlightData>({airportCode: '', flightsCount: 0, month: 0, year: 0});
+    const [flightsFetching, setFlightsFetching] = useState(false);
+    const [covidFetching, setCovidFetching] = useState(false);
 
     const formik = useFormik({
         initialValues: {
@@ -31,6 +33,8 @@ const Flights: FC<FlightsProps> = () => {
             month: 0,
         },
         onSubmit: values => {
+            setCovidFetching(true);
+            setFlightsFetching(true);
             fetchCovidData(values.countryCode, values.year, values.month + 1);
             fetchFlightsCount(values.airportCode, values.year, values.month + 1);
             setDisplayedMonthName(months[formik.values.month]);
@@ -53,9 +57,11 @@ const Flights: FC<FlightsProps> = () => {
         axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
             .then(response => {
                 setCovidData(response.data);
+                setCovidFetching(false);
             })
             .catch(error => {
                 console.log(error);
+                setCovidFetching(false);
             });
     }
 
@@ -63,9 +69,11 @@ const Flights: FC<FlightsProps> = () => {
         axios.get(`flights/airport/${airportCode}/year/${year}/month/${month}`)
             .then(response => {
                 setFlightData(response.data);
+                setFlightsFetching(false);
             })
             .catch(error => {
                 console.log(error);
+                setFlightsFetching(false);
             });
     }
 
@@ -99,6 +107,8 @@ const Flights: FC<FlightsProps> = () => {
                 years={years}
                 months={months}
                 formik={formik}
+                covidFetching={covidFetching}
+                flightsFetching={flightsFetching}
             />
         </>
     );

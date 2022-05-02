@@ -1,6 +1,6 @@
 import React, {FC} from 'react';
 import {Country} from "../../types/Country";
-import {Button, FloatingLabel, Form} from "react-bootstrap";
+import {Button, Col, FloatingLabel, Form} from "react-bootstrap";
 
 
 interface DataSelectionFormProps {
@@ -9,9 +9,19 @@ interface DataSelectionFormProps {
     years: number[];
     months: string[];
     formik: any;
+    covidFetching: boolean;
+    flightsFetching: boolean;
 }
 
-const DataSelectionForm: FC<DataSelectionFormProps> = ({countries, airports, years, months, formik}) => {
+const DataSelectionForm: FC<DataSelectionFormProps> = ({
+                                                           countries,
+                                                           airports,
+                                                           years,
+                                                           months,
+                                                           formik,
+                                                           covidFetching,
+                                                           flightsFetching
+                                                       }) => {
     return (
         <div className='row col-11 col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto mt-3'>
             <Form onSubmit={formik.handleSubmit} noValidate>
@@ -59,7 +69,15 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({countries, airports, yea
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">{formik.errors.year}</Form.Control.Feedback>
                 </FloatingLabel>
-                <Button variant="primary" type="submit" className='mt-2'>Fetch Data</Button>
+                <Col className="d-flex justify-content-center">
+                    <Button variant="primary" type="submit" className='mt-2 col-12 col-lg-3'>
+                        {(!covidFetching && !flightsFetching) ? 'Fetch Data' :
+                            <div className="spinner-grow spinner-grow-sm" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        }
+                    </Button>
+                </Col>
             </Form>
         </div>
     )

@@ -21,18 +21,18 @@ const Flights: FC<FlightsProps> = () => {
     const [countries, setCountries] = useState<Country[]>([]);
     const [airports, setAirports] = useState<string[]>([]);
     const [covidData, setCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
-    const [flightData, setFlightData] = useState<FlightData>({airportCode: "", flightsCount: 0, month: 0, year: 0});
+    const [flightData, setFlightData] = useState<FlightData>({airportCode: '', flightsCount: 0, month: 0, year: 0});
 
     const formik = useFormik({
         initialValues: {
             countryCode: 'AF',
             airportCode: '',
             year: 2020,
-            month: 1,
+            month: 0,
         },
         onSubmit: values => {
-            fetchCovidData(values.countryCode, values.year, values.month);
-            fetchFlightsCount(values.airportCode, values.year, values.month);
+            fetchCovidData(values.countryCode, values.year, values.month + 1);
+            fetchFlightsCount(values.airportCode, values.year, values.month + 1);
             setDisplayedMonthName(months[formik.values.month]);
         }
     });

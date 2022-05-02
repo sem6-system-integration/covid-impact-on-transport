@@ -37,7 +37,7 @@ const Login: FC<LoginProps> = ({redirectTo}) => {
                 })
                 .catch(error => {
                     if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-                        setServerError("Internal server error")
+                        setServerError("Wrong username or password")
                     }
                 })
         },

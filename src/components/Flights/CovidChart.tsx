@@ -32,6 +32,7 @@ const CovidChart: FC<CovidChartProps> = ({year1, year2, month, covidCases1, covi
                 text: 'Covid-19 Cases',
             },
         },
+        maintainAspectRatio: true,
     }
 
     let chartData = {

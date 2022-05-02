@@ -7,7 +7,7 @@ import {FlightData} from "../../types/FlightData";
 import {Country} from "../../types/Country";
 import useAxios from "../../hooks/useAxios";
 import {useFormik} from "formik";
-import {Col} from "react-bootstrap";
+import {Row} from "react-bootstrap";
 
 
 interface FlightsProps {
@@ -120,22 +120,26 @@ const Flights: FC<FlightsProps> = () => {
 
     return (
         <>
-            <Col xs={6} className='d-flex mt-5 mb-4 px-4'>
-                <CovidChart
-                    year1={displayedYear1}
-                    year2={displayedYear2}
-                    month={displayedMonthName}
-                    covidCases1={firstCovidData.confirmed}
-                    covidCases2={secondCovidData.confirmed}
-                />
-                <FlightChart
-                    year1={displayedYear1}
-                    year2={displayedYear2}
-                    month={displayedMonthName}
-                    flightCount1={firstFlightData.flightCount}
-                    flightCount2={secondFlightData.flightCount}
-                />
-            </Col>
+            <Row className='mx-auto mt-5 mb-3 justify-content-around col-11'>
+                <div className="col-5">
+                    <CovidChart
+                        year1={displayedYear1}
+                        year2={displayedYear2}
+                        month={displayedMonthName}
+                        covidCases1={firstCovidData.confirmed}
+                        covidCases2={secondCovidData.confirmed}
+                    />
+                </div>
+                <div className="col-5">
+                    <FlightChart
+                        year1={displayedYear1}
+                        year2={displayedYear2}
+                        month={displayedMonthName}
+                        flightCount1={firstFlightData.flightCount}
+                        flightCount2={secondFlightData.flightCount}
+                    />
+                </div>
+            </Row>
             <DataSelectionForm
                 countries={countries}
                 airports={airports}

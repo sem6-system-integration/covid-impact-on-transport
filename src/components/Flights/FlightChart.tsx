@@ -32,6 +32,7 @@ const FlightChart: FC<FlightChartProps> = ({year1, year2, month, flightCount1, f
                 text: 'Flight count',
             },
         },
+        maintainAspectRatio: true,
     }
 
     let chartData = {

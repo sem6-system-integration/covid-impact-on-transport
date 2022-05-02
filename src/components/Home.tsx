@@ -1,11 +1,12 @@
 import React, {FC} from 'react';
+import {Col} from "react-bootstrap";
 
 
 interface HomeProps {
 }
 
 const Home: FC<HomeProps> = () => (
-    <div className="mx-auto mt-5 text-center">
+    <Col className="mx-auto mt-5 text-center px-4 px-lg-5">
         <h1 className="mb-4">Covid impact on transport</h1>
         <p>Welcome to the Covid impact on transport app!</p>
         <p>
@@ -13,7 +14,7 @@ const Home: FC<HomeProps> = () => (
             You can choose between different airports in different countries and compare
             the number of flights with the number of cases in selected time.
         </p>
-    </div>
+    </Col>
 );
 
 export default Home;

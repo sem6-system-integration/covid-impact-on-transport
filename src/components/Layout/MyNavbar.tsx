@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {TokenContext} from "../../App";
 import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {LinkContainer} from "react-router-bootstrap";
-import {getClaimFromToken} from "../../helpers/token-helper";
+import {getClaimFromToken} from "../../utils/tokenUtils";
 
 
 interface MyNavbarProps {

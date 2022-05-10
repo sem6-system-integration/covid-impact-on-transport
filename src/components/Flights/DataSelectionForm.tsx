@@ -85,8 +85,8 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">{formik.errors.month}</Form.Control.Feedback>
                 </FloatingLabel>
-                <Col className="d-flex justify-content-center">
-                    <Button variant="primary" type="submit" className='mt-2 col-12 col-lg-3'>
+                <Col className="d-flex justify-content-center mt-3">
+                    <Button variant="primary" type="submit" className='col-12 col-lg-3'>
                         {(!covidFetching && !flightsFetching) ? 'Fetch Data' :
                             <div className="spinner-grow spinner-grow-sm" role="status">
                                 <span className="visually-hidden">Loading...</span>

@@ -7,7 +7,7 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({children}) => (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 pb-5">
         <MyNavbar/>
         <>{children}</>
     </div>

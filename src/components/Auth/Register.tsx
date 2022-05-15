@@ -68,7 +68,6 @@ const Register: FC<RegisterProps> = () => {
                     <Form.Control.Feedback type="invalid">{formik.errors.password}</Form.Control.Feedback>
                 </FloatingLabel>
                 <Form.Group className="mb-3">
-                    {/*<Form.Label htmlFor="inputAccountType">Account type</Form.Label>*/}
                     <ButtonGroup className="mb-3 d-flex" id="inputAccountType">
                         <Button
                             name="accountType"

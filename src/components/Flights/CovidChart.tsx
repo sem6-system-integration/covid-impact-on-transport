@@ -1,6 +1,7 @@
 import React, {FC} from 'react';
 import {BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from "chart.js";
 import {Bar} from 'react-chartjs-2';
+import {CovidData} from '../../types/CovidData';
 
 ChartJS.register(
     CategoryScale,
@@ -13,14 +14,12 @@ ChartJS.register(
 
 
 interface CovidChartProps {
-    year1: number;
-    year2: number;
+    covidData1: CovidData;
+    covidData2: CovidData;
     month: string;
-    covidCases1: number;
-    covidCases2: number;
 }
 
-const CovidChart: FC<CovidChartProps> = ({year1, year2, month, covidCases1, covidCases2}) => {
+const CovidChart: FC<CovidChartProps> = ({covidData1, covidData2, month}) => {
     const chartOptions = {
         responsive: true,
         plugins: {
@@ -29,23 +28,23 @@ const CovidChart: FC<CovidChartProps> = ({year1, year2, month, covidCases1, covi
             },
             title: {
                 display: true,
-                text: 'Covid-19 Cases',
+                text: `Covid-19 Cases ${covidData1.deaths && covidData2.deaths ? 'and Deaths' : ''}`,
             },
         },
         maintainAspectRatio: true,
     }
 
     let chartData = {
-        labels: [month],
+        labels: covidData1.deaths && covidData2.deaths ? ["Cases", "Deaths"] : ["Cases"],
         datasets: [
             {
-                label: year1,
-                data: [covidCases1],
+                label: `${month} ${covidData1.year}`,
+                data: [covidData1.confirmed, covidData1.deaths],
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
-                label: year2,
-                data: [covidCases2],
+                label: `${month} ${covidData2.year}`,
+                data: [covidData2.confirmed, covidData2.deaths],
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             }
         ],

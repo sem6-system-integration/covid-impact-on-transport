@@ -1,14 +1,16 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useContext, useEffect, useState} from 'react';
 import DataSelectionForm from "./DataSelectionForm";
 import FlightChart from "./FlightChart";
 import CovidChart from "./CovidChart";
-import {CovidData} from "../../types/CovidData";
 import {FlightData} from "../../types/FlightData";
 import {Country} from "../../types/Country";
 import useAxios from "../../hooks/useAxios";
 import {useFormik} from "formik";
 import {Row} from "react-bootstrap";
 import * as yup from "yup";
+import {TokenContext} from '../../App';
+import {getClaimFromToken} from '../../utils/tokenUtils';
+import {CovidData} from '../../types/CovidData';
 
 const currentYear = new Date().getFullYear();
 
@@ -46,8 +48,8 @@ const Flights: FC<FlightsProps> = () => {
     const [displayedYear2, setDisplayedYear2] = useState(years[2]);
     const [countries, setCountries] = useState<Country[]>([]);
     const [airports, setAirports] = useState<string[]>([]);
-    const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
-    const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: 0, year: 0});
+    const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: null, year: 2020});
+    const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: null, year: 2021});
     const [firstFlightData, setFirstFlightData] = useState<FlightData>({
         airportCode: '', flightCount: 0, month: 0, year: 0
     });
@@ -56,6 +58,9 @@ const Flights: FC<FlightsProps> = () => {
     });
     const [flightsFetching, setFlightsFetching] = useState(false);
     const [covidFetching, setCovidFetching] = useState(false);
+    const {token} = useContext(TokenContext);
+
+    const userRoles = getClaimFromToken(token, "authorities")! as string[];
 
     const formik = useFormik({
         initialValues: {
@@ -70,13 +75,30 @@ const Flights: FC<FlightsProps> = () => {
             setCovidFetching(true);
             setFlightsFetching(true);
 
-            const covidData1 = await fetchCovidData(values.countryCode, values.year1, parseInt(String(values.month)) + 1);
-            const covidData2 = await fetchCovidData(values.countryCode, values.year2, parseInt(String(values.month)) + 1);
+            const covidCases1 = await fetchCovidCases(values.countryCode, values.year1, parseInt(String(values.month)) + 1);
+            let covidData1: CovidData = {
+                year: covidCases1.year,
+                confirmed: covidCases1.confirmed,
+                deaths: null
+            };
+            const covidCases2 = await fetchCovidCases(values.countryCode, values.year2, parseInt(String(values.month)) + 1);
+            let covidData2: CovidData = {
+                year: covidCases2.year,
+                confirmed: covidCases2.confirmed,
+                deaths: null
+            };
             const flightData1 = await fetchFlightData(values.airportCode, values.year1, parseInt(String(values.month)) + 1);
             const flightData2 = await fetchFlightData(values.airportCode, values.year2, parseInt(String(values.month)) + 1);
+            if (userRoles.includes("PREMIUM")) {
+                const covidDeaths1 = await fetchCovidDeaths(values.countryCode, values.year1, parseInt(String(values.month)) + 1);
+                covidData1.deaths = covidDeaths1.deaths;
+                const covidDeaths2 = await fetchCovidDeaths(values.countryCode, values.year2, parseInt(String(values.month)) + 1);
+                covidData2.deaths = covidDeaths2.deaths;
+            }
+
             setCovidFetching(false);
             setFlightsFetching(false);
-            if (!covidData1 || !covidData2 || !flightData1 || !flightData2) return
+            if (!covidCases1 || !covidCases2 || !flightData1 || !flightData2) return
 
             setFirstCovidData(covidData1);
             setSecondCovidData(covidData2);
@@ -101,9 +123,18 @@ const Flights: FC<FlightsProps> = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [axios, formik.values.countryCode]);
 
-    const fetchCovidData = async (countryCode: string, year: number, month: number) => {
+    const fetchCovidCases = async (countryCode: string, year: number, month: number) => {
         try {
-            const response = await axios.get(`covid/country/${countryCode}/year/${year}/month/${month}`)
+            const response = await axios.get(`covid/country/${countryCode}/year/${year}/month/${month}/cases`)
+            return response.data
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const fetchCovidDeaths = async (countryCode: string, year: number, month: number) => {
+        try {
+            const response = await axios.get(`covid/country/${countryCode}/year/${year}/month/${month}/deaths`)
             return response.data
         } catch (error) {
             console.log(error);
@@ -142,11 +173,9 @@ const Flights: FC<FlightsProps> = () => {
             <Row className='mx-auto mt-5 mb-3 justify-content-around col-11'>
                 <div className="col-5">
                     <CovidChart
-                        year1={displayedYear1}
-                        year2={displayedYear2}
+                        covidData1={firstCovidData}
+                        covidData2={secondCovidData}
                         month={displayedMonthName}
-                        covidCases1={firstCovidData.confirmed}
-                        covidCases2={secondCovidData.confirmed}
                     />
                 </div>
                 <div className="col-5">

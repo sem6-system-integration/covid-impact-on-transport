@@ -36,15 +36,15 @@ const FlightChart: FC<FlightChartProps> = ({year1, year2, month, flightCount1, f
     }
 
     let chartData = {
-        labels: [month],
+        labels: ["Flight count"],
         datasets: [
             {
-                label: year1,
+                label: `${month} ${year1}`,
                 data: [flightCount1],
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
-                label: year2,
+                label: `${month} ${year2}`,
                 data: [flightCount2],
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
             }

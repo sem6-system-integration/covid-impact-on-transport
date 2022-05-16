@@ -4,12 +4,12 @@ import * as yup from "yup";
 import YupPassword from "yup-password";
 import useAxios from "../../hooks/useAxios";
 import {useFormik} from "formik";
-import {Alert, Button, Col, FloatingLabel, Form} from "react-bootstrap";
+import {Alert, Button, ButtonGroup, Col, FloatingLabel, Form} from 'react-bootstrap';
 
 YupPassword(yup);
 const registerValidationSchema = yup.object().shape({
     username: yup.string().required().min(4).max(32).label('Username'),
-    password: yup.string().required().password().label('Password')
+    password: yup.string().required().password().label('Password'),
 });
 
 interface RegisterProps {
@@ -23,7 +23,8 @@ const Register: FC<RegisterProps> = () => {
     const formik = useFormik({
         initialValues: {
             username: '',
-            password: ''
+            password: '',
+            accountType: 'STANDARD'
         },
         validationSchema: registerValidationSchema,
         onSubmit: values => {
@@ -66,6 +67,26 @@ const Register: FC<RegisterProps> = () => {
                     />
                     <Form.Control.Feedback type="invalid">{formik.errors.password}</Form.Control.Feedback>
                 </FloatingLabel>
+                <Form.Group className="mb-3">
+                    <ButtonGroup className="mb-3 d-flex" id="inputAccountType">
+                        <Button
+                            name="accountType"
+                            variant="outline-primary"
+                            active={formik.values.accountType === 'STANDARD'}
+                            value={'STANDARD'}
+                            onClick={formik.handleChange}>
+                            Standard
+                        </Button>
+                        <Button
+                            name="accountType"
+                            variant="outline-primary"
+                            active={formik.values.accountType === 'PREMIUM'}
+                            value={'PREMIUM'}
+                            onClick={formik.handleChange}>
+                            Premium
+                        </Button>
+                    </ButtonGroup>
+                </Form.Group>
                 <Form.Group className="d-grid mt-4">
                     <Button type="submit" variant="primary">Sign Up</Button>
                 </Form.Group>

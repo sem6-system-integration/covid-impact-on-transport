@@ -1,6 +1,6 @@
 import jwtDecode from "jwt-decode";
 
-export const getClaimFromToken = (token: string, field: string): string | number => {
+export const getClaimFromToken = (token: string, field: string): string | number | Array<string> => {
     const tokenData = jwtDecode(token) as { [key: string]: string | number };
     return tokenData[field];
 };

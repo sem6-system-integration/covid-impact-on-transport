@@ -1,11 +1,12 @@
 import React, {FC} from 'react';
 import {Country} from "../../types/Country";
 import {Button, Col, FloatingLabel, Form} from "react-bootstrap";
+import {Airport} from '../../types/Airport';
 
 
 interface DataSelectionFormProps {
     countries: Country[];
-    airports: string[];
+    airports: Airport[];
     years: number[];
     months: string[];
     formik: any;
@@ -41,8 +42,8 @@ const DataSelectionForm: FC<DataSelectionFormProps> = ({
                         name="airportCode"
                         onChange={formik.handleChange}
                         value={formik.values.airportCode}>
-                        {airports.map((airportCode) =>
-                            <option key={airportCode} value={airportCode}>{airportCode}</option>
+                        {airports.map((airport) =>
+                            <option key={airport.icao} value={airport.icao}>{`${airport.icao} (${airport.name})`}</option>
                         )}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">{formik.errors.airport}</Form.Control.Feedback>

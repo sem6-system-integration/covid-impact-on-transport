@@ -11,6 +11,7 @@ import * as yup from "yup";
 import {TokenContext} from '../../App';
 import {getClaimFromToken} from '../../utils/tokenUtils';
 import {CovidData} from '../../types/CovidData';
+import {Airport} from '../../types/Airport';
 
 const currentYear = new Date().getFullYear();
 
@@ -47,7 +48,7 @@ const Flights: FC<FlightsProps> = () => {
     const [displayedYear1, setDisplayedYear1] = useState(years[1]);
     const [displayedYear2, setDisplayedYear2] = useState(years[2]);
     const [countries, setCountries] = useState<Country[]>([]);
-    const [airports, setAirports] = useState<string[]>([]);
+    const [airports, setAirports] = useState<Airport[]>([]);
     const [firstCovidData, setFirstCovidData] = useState<CovidData>({confirmed: 0, deaths: null, year: 2020});
     const [secondCovidData, setSecondCovidData] = useState<CovidData>({confirmed: 0, deaths: null, year: 2021});
     const [firstFlightData, setFirstFlightData] = useState<FlightData>({
@@ -114,8 +115,8 @@ const Flights: FC<FlightsProps> = () => {
     useEffect(() => {
         axios.get(`airports/country/${formik.values.countryCode}`)
             .then(response => {
-                setAirports(response.data['airportCodes']);
-                formik.setFieldValue('airportCode', response.data['airportCodes'][0]);
+                setAirports(response.data['airports'])
+                formik.setFieldValue('airportCode', response.data['airports'][0].icao);
             })
             .catch(error => {
                 console.log(error);
